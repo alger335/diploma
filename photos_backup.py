@@ -1,5 +1,19 @@
 import requests
 
+with open('token.txt', 'r') as file_object:
+    token = file_object.read().strip()
+
+
+URL = 'https://api.vk.com/method/users.get'
+params = {
+    'user_id': '1',
+    'access_token': token,
+    'v':'5.130',
+    'fields': 'education, sex'
+}
+res = requests.get(URL, params=params)
+res.json()
+
 
 class VkUser:
     url = 'https://api.vk.com/method/'
