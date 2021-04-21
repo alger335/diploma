@@ -30,13 +30,23 @@ params = {
 }
 res = requests.get(URL, params=params)
 photos = res.json()['response']['items']
+# pprint(photos)
 urls = []
+photo_json = {}
+photos_json = []
 # обрабатываем каждую фотографию
 for i in range(len(photos)):
     # берём ссылку на максимальный размер фотографии
-    photo_url = str(photos[i]["sizes"][len(photos[i]["sizes"]) - 1]["url"])
-    photo_json
+    photo_url = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['url'])
+    photo_name = photos[i]['likes']['count']
+    photo_size = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['type'])
+    photo_json['file_name'] = f'{photo_name}.jpg'
+    photo_json['size'] = photo_size
+    photos_json.append(photo_json)
     urls.append(photo_url)
+    # pprint(photo_json)
+    pprint(photos_json)
+    pprint(urls)
 
 
 # ya = YaUploader(token=token_ya)
