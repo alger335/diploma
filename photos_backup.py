@@ -52,7 +52,7 @@ for i in range(len(photos)):
     # j = photo_json.json()
     # photos_json = [value for value in photo_json.values() if isinstance(value, dict) ]
     # photos_json.append(photo_json)
-    with open('users.json', 'a') as outfile:
+    with open('photos.json', 'a') as outfile:
         json.dump(photo_json, outfile)
     
     # urls.append(photo_url)
