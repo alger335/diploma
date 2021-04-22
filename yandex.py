@@ -19,10 +19,11 @@ class YaUploader:
         response = requests.get(upload_url, headers=headers, params=params)
         return response.json()
 
-    def upload_file_to_disk(self, full_path):
-        filename = os.path.basename(full_path)
-        href = self._get_upload_link(f"netology/{filename}").get("href", "")
-        response = requests.put(href, data=open(filename, 'rb'))
-        response.raise_for_status()
-        if response.status_code == 201:
-            print(f"Файл {filename} успешно загружен!")
+    def upload_file_to_disk(self, name_url):
+        for key, value in name_url:
+            # filename = key
+            href = self._get_upload_link(f"netology/{key}").get("href", "")
+            response = requests.put(href, data=open(filename, 'rb'))
+            response.raise_for_status()
+            if response.status_code == 201:
+                print(f"Файл {filename} успешно загружен!")
