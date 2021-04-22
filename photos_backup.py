@@ -1,6 +1,8 @@
 import requests
 from yandex import YaUploader
 from pprint import pprint
+from datetime import datetime
+import json
 
 with open('token_vk.txt', 'r') as file_object:
     token_vk = file_object.read().strip()
@@ -9,6 +11,7 @@ with open('token_ya.txt', 'r') as file_object:
     token_ya = file_object.read().strip()
 
 userid = '552934290'
+# ts = int("1284101485")
 
 ## Задание:
 # Нужно написать программу, которая будет:
@@ -28,26 +31,38 @@ params = {
     'v': '5.130',
     # 'fields': 'education, sex'
 }
-res = requests.get(URL, params=params)
+res = requests.get(URL, params=params, verify=False)
+pprint(res.json())
 photos = res.json()['response']['items']
 # pprint(photos)
 urls = []
 photo_json = {}
 photos_json = []
+# date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
 # обрабатываем каждую фотографию
 for i in range(len(photos)):
     # берём ссылку на максимальный размер фотографии
     photo_url = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['url'])
-    photo_name = photos[i]['likes']['count']
+    likes_count = photos[i]['likes']['count']
     photo_size = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['type'])
-    photo_json['file_name'] = f'{photo_name}.jpg'
+    ts = (photos[i]['date'])
+    date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
+    photo_json['file_name'] = f'{likes_count}-{date}.jpg'
     photo_json['size'] = photo_size
-    photos_json.append(photo_json)
-    urls.append(photo_url)
+    # j = photo_json.json()
+    # photos_json = [value for value in photo_json.values() if isinstance(value, dict) ]
+    # photos_json.append(photo_json)
+    with open('users.json', 'a') as outfile:
+        json.dump(photo_json, outfile)
+    
+    # urls.append(photo_url)
     # pprint(photo_json)
-    pprint(photos_json)
-    pprint(urls)
-
+    # pprint(photos_json)
+    # pprint(urls)
+# with open('users.json', encoding = "utf-8") as f:
+#     data = json.load(f)
+#     pprint(data)
+print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
 
 # ya = YaUploader(token=token_ya)
 # ya.upload_file_to_disk("D:/IT/Python/netology/Full_Course/requests/test.txt")
@@ -61,6 +76,11 @@ for i in range(len(photos)):
 
 
 
+
+
+
+# if you encounter a "year is out of range" error the timestamp
+# may be in milliseconds, try ts /= 1000 in that case
 
 
 
