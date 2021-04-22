@@ -36,6 +36,7 @@ photos = res.json()['response']['items']
 urls = []
 photo_json = {}
 photos_json = []
+name_url = {}
 # обрабатываем каждую фотографию
 for i in range(len(photos)):
     # берём ссылку на максимальный размер фотографии
@@ -48,56 +49,26 @@ for i in range(len(photos)):
     ts = (photos[i]['date'])
     date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
     # формируем словарь с именем файла и размером
-    photo_json['file_name'] = f'{likes_count}-{date}.jpg'
+    file_name = f'{likes_count}-{date}.jpg'
+    photo_json['file_name'] = file_name
     photo_json['size'] = photo_size
+    name_url[file_name] = photo_url
     # пишем в json
     with open('photos.json', 'a') as outfile:
         json.dump(photo_json, outfile)
     # собираем список ссылок на фотки
     urls.append(photo_url)
-pprint(urls)
+
+pprint(name_url)
 
 
 
-# ya = YaUploader(token=token_ya)
-# ya.upload_file_to_disk("D:/IT/Python/netology/Full_Course/requests/test.txt")
-
-
-
-
-
+ya = YaUploader(token=token_ya)
+ya.upload_file_to_disk(name_url)
 
 
 
 
-
-
-
-
-# if you encounter a "year is out of range" error the timestamp
-# may be in milliseconds, try ts /= 1000 in that case
-
-
-
-
-
-
-# for i in res.json()['response']['items']:
-#     # pprint(i)
-#     # В каждой фото вытаскиваем список размеров
-#     for f in i['sizes']:
-#         size = f['height'] * f['width']
-#         sizes_list.append([f['url'], size])
-#         pprint(sizes_list)
-    # max_size.append(max(sizes_list[1]))
-    # pprint(max_size)
-
-# v = list(res.json.values())
-# k = list(res.json.keys())
-# best_hero = k[v.index(max(v))]
-# print(f'Самый умный супергерой: {best_hero}')
-# pprint(res.json())
-#
 
 
 # class VkUser:
