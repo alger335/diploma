@@ -11,7 +11,6 @@ with open('token_ya.txt', 'r') as file_object:
     token_ya = file_object.read().strip()
 
 userid = '552934290'
-# ts = int("1284101485")
 
 ## Задание:
 # Нужно написать программу, которая будет:
@@ -29,40 +28,36 @@ params = {
     'photo_sizes': 1,
     'access_token': token_vk,
     'v': '5.130',
-    # 'fields': 'education, sex'
 }
+
+
 res = requests.get(URL, params=params, verify=False)
-pprint(res.json())
 photos = res.json()['response']['items']
-# pprint(photos)
 urls = []
 photo_json = {}
 photos_json = []
-# date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
 # обрабатываем каждую фотографию
 for i in range(len(photos)):
     # берём ссылку на максимальный размер фотографии
     photo_url = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['url'])
+    # считаем лайки
     likes_count = photos[i]['likes']['count']
+    # смотрим размер фотки
     photo_size = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['type'])
+    # берем дату публикации фотки
     ts = (photos[i]['date'])
     date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H:%M:%S')
+    # формируем словарь с именем файла и размером
     photo_json['file_name'] = f'{likes_count}-{date}.jpg'
     photo_json['size'] = photo_size
-    # j = photo_json.json()
-    # photos_json = [value for value in photo_json.values() if isinstance(value, dict) ]
-    # photos_json.append(photo_json)
+    # пишем в json
     with open('photos.json', 'a') as outfile:
         json.dump(photo_json, outfile)
-    
-    # urls.append(photo_url)
-    # pprint(photo_json)
-    # pprint(photos_json)
-    # pprint(urls)
-# with open('users.json', encoding = "utf-8") as f:
-#     data = json.load(f)
-#     pprint(data)
-print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
+    # собираем список ссылок на фотки
+    urls.append(photo_url)
+pprint(urls)
+
+
 
 # ya = YaUploader(token=token_ya)
 # ya.upload_file_to_disk("D:/IT/Python/netology/Full_Course/requests/test.txt")
