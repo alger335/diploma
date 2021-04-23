@@ -1,22 +1,18 @@
-# 2. Сделать прогресс-бар
-# 3. Оформить код в функции и классы
-# 4. Поправить photos_json
-
 # Добавить функционал:
 # - Сохранять фотографии и из других альбомов.
 # - Сохранять фотографии из других социальных сетей. [Одноклассники](https://apiok.ru/) и [Инстаграмм](https://www.instagram.com/developer/)
 # - Сохранять фотографии на Google.Drive.
 
+# добавить try - except
 # - сделать удобную менюшку
 # - проверка контрольной суммы
 
 # userid = '2236706'  # '552934290'
 
 import requests
-from yandex import YaUploader
-from pprint import pprint
 from datetime import datetime
 import json
+from pprint import pprint
 
 with open('token_vk.txt', 'r') as file_object:
     token_vk = file_object.read().strip()
@@ -32,28 +28,22 @@ class VKPhotos:
         self.token = token_vk
         self.version = '5.130'
         self.params = {
-            # 'user_id': vk_user_id,
-            # 'album_id': 'profile',
-            # 'extended': 1,
-            # 'photo_sizes': 1,
             'access_token': token_vk,
             'v': '5.130',
         }
 
     def get_photos(self):
-        # URL = 'https://api.vk.com/method/photos.get'
         vk_user_id = str(input("Введите id пользователя: "))
-        photo_range = int(input("Введите количество фотографий для загрузки(по умолчанию 5): "))
-        urls = []
-        photo_json = {}
+        photo_range = int(input("Введите количество фотографий для загрузки: "))
         name_url = {}
+        photos_json = []
         photos_params = {
             'user_id': vk_user_id,
             'album_id': 'profile',
             'extended': 1,
             'photo_sizes': 1,
         }
-        res = requests.get(self.URL+'photos.get', params={**self.params, **photos_params})
+        res = requests.get(self.URL + 'photos.get', params={**self.params, **photos_params})
         photos = res.json()['response']['items']
         # обрабатываем каждую фотографию
         for i in range(photo_range):
@@ -68,15 +58,11 @@ class VKPhotos:
             date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
             # формируем словарь с именем файла и размером
             file_name = f'{likes_count}-{date}.jpg'
-            photo_json['file_name'] = file_name
-            photo_json['size'] = photo_size
             name_url[file_name] = photo_url
+            # формируем выходной json
+            photos_json.append({'file_name': file_name, 'size': photo_size})
             # пишем в json
-            with open('photos.json', 'a') as outfile:
-                json.dump(photo_json, outfile)
-            # собираем список ссылок на фотки
-            # urls.append(photo_url)
+        with open('photos.json', 'a') as outfile:
+            json.dump(photos_json, outfile)
         return name_url
 
-ya = YaUploader(token=token_ya)
-ya.upload_file_to_disk(name_url)
