@@ -8,7 +8,6 @@ class YaUploader:
 
     def __init__(self, token):
         self.token = token
-        self.timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
 
     def get_headers(self):
         return {
@@ -21,7 +20,6 @@ class YaUploader:
         headers = self.get_headers()
         params = {"path": disk_file_path, "overwrite": "true"}
         response = requests.get(upload_url, headers=headers, params=params)
-        # pprint(response.json())
         return response.json()
 
     def create_folder(self):
@@ -31,15 +29,15 @@ class YaUploader:
         dirname = f'VK{dirname}'
         params = {"path": dirname}
         response = requests.put(mkdir_url, headers=headers, params=params)
+        timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
         response.raise_for_status()
         if response.status_code == 201:
             with open('upload_log.txt', 'a') as logfile:
-                logfile.write(f'{self.timestamp} Папка {dirname} успешно создана!\n')
+                logfile.write(f'{timestamp} Папка {dirname} успешно создана!\n')
         return dirname
 
     def upload_file_to_disk(self, name_url):
         directory = self.create_folder()
-        timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
         for key, value in tqdm(name_url.items()):
             # получаем ссылку для загруски на диск
             href = self._get_upload_link(f"{directory}/{key}").get("href", "")
@@ -49,6 +47,7 @@ class YaUploader:
             # загружаем файл на яндекс диск
             response = requests.put(href, data=image_data)
             response.raise_for_status()
+            timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
             if response.status_code == 201:
                 with open('upload_log.txt', 'a') as logfile:
                     logfile.write(f'{timestamp} Файл {key} успешно загружен!\n')

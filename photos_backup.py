@@ -12,7 +12,6 @@
 import requests
 from datetime import datetime
 import json
-from pprint import pprint
 
 with open('token_vk.txt', 'r') as file_object:
     token_vk = file_object.read().strip()
@@ -35,11 +34,12 @@ class VKPhotos:
     def get_photos(self):
         vk_user_id = str(input("Введите id пользователя: "))
         photo_range = int(input("Введите количество фотографий для загрузки: "))
+        album_id = str(input("Введите album_id(profile, wall, ): "))
         name_url = {}
         photos_json = []
         photos_params = {
             'user_id': vk_user_id,
-            'album_id': 'profile',
+            'album_id': album_id,
             'extended': 1,
             'photo_sizes': 1,
         }
