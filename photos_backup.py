@@ -41,7 +41,7 @@ class VKPhotos:
             # берем дату публикации фотки
             ts = (photos[i]['date'])
             date = datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d_%H-%M-%S')
-            # формируем словарь с именем файла и размером
+            # формируем словарь с именем файла и ссылкой
             file_name = f'{likes_count}-{date}.jpg'
             name_url[file_name] = photo_url
             # формируем выходной json
