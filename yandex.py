@@ -6,8 +6,8 @@ from tqdm import tqdm
 
 class YaUploader:
 
-    def __init__(self, token):
-        self.token = token
+    def __init__(self):
+        self.token = str(input("Введите токен Яндекс диска: "))
 
     def get_headers(self):
         return {
