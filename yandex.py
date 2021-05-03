@@ -2,12 +2,21 @@ import requests
 from datetime import datetime, time
 import time
 from tqdm import tqdm
+import os
+
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+# print(APP_DIR)
+MY_FILE = os.path.join(APP_DIR, 'token_ya.txt')
+# print(MY_FILE)
+
+with open(MY_FILE) as file:
+    token_ya = file.read().strip()
 
 
 class YaUploader:
 
     def __init__(self):
-        self.token = str(input("Введите токен Яндекс диска: "))
+        self.token = token_ya
 
     def get_headers(self):
         return {
@@ -32,7 +41,7 @@ class YaUploader:
         timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
         response.raise_for_status()
         if response.status_code == 201:
-            with open('upload_log.txt', 'a') as logfile:
+            with open('upload_log.txt', 'a', encoding='utf-8') as logfile:
                 logfile.write(f'{timestamp} Папка {dirname} успешно создана!\n')
         return dirname
 
@@ -49,7 +58,7 @@ class YaUploader:
             response.raise_for_status()
             timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
             if response.status_code == 201:
-                with open('upload_log.txt', 'a') as logfile:
+                with open('upload_log.txt', 'a', encoding='utf-8') as logfile:
                     logfile.write(f'{timestamp} Файл {key} успешно загружен!\n')
             else:
                 message = 'Что-то пошло не так!'
@@ -57,3 +66,4 @@ class YaUploader:
                 with open('upload_log.txt', 'a') as logfile:
                     logfile.write(f'{timestamp} Ошибка {response.status_code} при загрузке {key}!\n')
             time.sleep(1)
+        print('Загрузка завершена!')
