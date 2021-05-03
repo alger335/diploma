@@ -5,9 +5,7 @@ from tqdm import tqdm
 import os
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# print(APP_DIR)
 MY_FILE = os.path.join(APP_DIR, 'token_ya.txt')
-# print(MY_FILE)
 
 with open(MY_FILE) as file:
     token_ya = file.read().strip()
@@ -33,13 +31,24 @@ class YaUploader:
 
     def create_folder(self):
         mkdir_url = "https://cloud-api.yandex.net/v1/disk/resources"
+        response = ''
         headers = self.get_headers()
         dirname = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         dirname = f'VK{dirname}'
         params = {"path": dirname}
-        response = requests.put(mkdir_url, headers=headers, params=params)
+
+        try:
+            response = requests.put(mkdir_url, headers=headers, params=params)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as errh:
+            print("Http Error:", errh)
+        except requests.exceptions.ConnectionError as errc:
+            print("Error Connecting:", errc)
+        except requests.exceptions.Timeout as errt:
+            print("Timeout Error:", errt)
+        except requests.exceptions.RequestException as err:
+            print("OOps: Something Else", err)
         timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
-        response.raise_for_status()
         if response.status_code == 201:
             with open('upload_log.txt', 'a', encoding='utf-8') as logfile:
                 logfile.write(f'{timestamp} Папка {dirname} успешно создана!\n')

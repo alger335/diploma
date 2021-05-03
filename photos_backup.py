@@ -4,7 +4,6 @@ import json
 import os
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
-# print(APP_DIR)
 MY_FILE = os.path.join(APP_DIR, 'token_vk.txt')
 with open(MY_FILE) as file_object:
     token_vk = file_object.read().strip()
@@ -22,26 +21,28 @@ class VKPhotos:
         }
 
     def get_photos(self, vk_user_id, vk_album_id, photo_range=5):
-        # vk_user_id = str(input("Введите id пользователя: "))
-        # photo_range = int(input("Введите количество фотографий для загрузки: "))
         name_url = {}
         photos_json = []
+        res = ''
         photos_params = {
             'user_id': vk_user_id,
             'album_id': vk_album_id,
             'extended': 1,
             'photo_sizes': 1,
         }
-        res = requests.get(self.URL + 'photos.get', params={**self.params, **photos_params})
-        res.raise_for_status()
-        # print(res.status_code)
-        # print(res.json())
-        photos = res.json()['response']['items']
-
-        # if res.status_code == 201:
-        #     with open('upload_log.txt', 'a', encoding='UTF-8') as logfile:
-        #         logfile.write(f'{timestamp} Папка {dirname} успешно создана!\n')
-        # обрабатываем каждую фотографию
+        try:
+            res = requests.get(self.URL + 'photos.get', params={**self.params, **photos_params})
+            res.raise_for_status()
+        except requests.exceptions.HTTPError as errh:
+            print("Http Error:", errh)
+        except requests.exceptions.ConnectionError as errc:
+            print("Error Connecting:", errc)
+        except requests.exceptions.Timeout as errt:
+            print("Timeout Error:", errt)
+        except requests.exceptions.RequestException as err:
+            print("OOps: Something Else", err)
+        finally:
+            photos = res.json()['response']['items']
         for i in range(photo_range):
             # берём ссылку на максимальный размер фотографии
             photo_url = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['url'])
