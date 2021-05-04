@@ -10,29 +10,21 @@ with open(MY_FILE) as file_object:
 
 
 class VKPhotos:
-    URL = 'https://api.vk.com/method/'
 
     def __init__(self, ):
         self.token = token_vk
+        self.host = 'https://api.vk.com/method/'
         self.version = '5.130'
         self.params = {
             'access_token': token_vk,
             'v': '5.130',
         }
 
-    def get_photos(self, vk_user_id, vk_album_id, photo_range=5):
-        name_url = {}
-        photos_json = []
-        res = ''
-        photos_params = {
-            'user_id': vk_user_id,
-            'album_id': vk_album_id,
-            'extended': 1,
-            'photo_sizes': 1,
-        }
+    def _api_request(self, http_method, api_method, params, response_type):
+        response = ''
         try:
-            res = requests.get(self.URL + 'photos.get', params={**self.params, **photos_params})
-            res.raise_for_status()
+            response = requests.request(http_method, f'{self.host}/{api_method}', params=params)
+            response.raise_for_status()
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
         except requests.exceptions.ConnectionError as errc:
@@ -41,8 +33,24 @@ class VKPhotos:
             print("Timeout Error:", errt)
         except requests.exceptions.RequestException as err:
             print("OOps: Something Else", err)
-        finally:
-            photos = res.json()['response']['items']
+        if response_type == 'json':
+            return response
+
+    def get_photos(self, vk_user_id, vk_album_id, photo_range=5):
+        name_url = {}
+        photos_json = []
+        http_method = 'get'
+        api_method = 'photos.get'
+        response_type = 'json'
+        photos_params = {
+            'user_id': vk_user_id,
+            'album_id': vk_album_id,
+            'extended': 1,
+            'photo_sizes': 1,
+        }
+        params = {**self.params, **photos_params}
+        res = self._api_request(http_method, api_method, params, response_type)
+        photos = res.json()['response']['items']
         for i in range(photo_range):
             # берём ссылку на максимальный размер фотографии
             photo_url = str(photos[i]['sizes'][len(photos[i]['sizes']) - 1]['url'])

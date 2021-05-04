@@ -15,30 +15,12 @@ class YaUploader:
 
     def __init__(self):
         self.token = token_ya
+        self.host = 'https://cloud-api.yandex.net/v1/disk'
 
-    def get_headers(self):
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': 'OAuth {}'.format(self.token)
-        }
-
-    def _get_upload_link(self, disk_file_path):
-        upload_url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
-        headers = self.get_headers()
-        params = {"path": disk_file_path, "overwrite": "true"}
-        response = requests.get(upload_url, headers=headers, params=params)
-        return response.json()
-
-    def create_folder(self):
-        mkdir_url = "https://cloud-api.yandex.net/v1/disk/resources"
+    def _api_request(self, http_method, api_method, headers, params, response_type):
         response = ''
-        headers = self.get_headers()
-        dirname = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-        dirname = f'VK{dirname}'
-        params = {"path": dirname}
-
         try:
-            response = requests.put(mkdir_url, headers=headers, params=params)
+            response = requests.request(http_method, f'{self.host}/{api_method}', headers=headers, params=params)
             response.raise_for_status()
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
@@ -48,6 +30,34 @@ class YaUploader:
             print("Timeout Error:", errt)
         except requests.exceptions.RequestException as err:
             print("OOps: Something Else", err)
+        if response_type == 'json':
+            return response
+
+    def get_headers(self):
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': 'OAuth {}'.format(self.token)
+        }
+
+    def _get_upload_link(self, disk_file_path):
+        # upload_url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
+        api_method = 'resources/upload'
+        http_method = 'get'
+        headers = self.get_headers()
+        params = {"path": disk_file_path, "overwrite": "true"}
+        response_type = 'json'
+        response = self._api_request(http_method, api_method, headers, params, response_type)
+        return response.json()
+
+    def create_folder(self):
+        api_method = 'resources'
+        http_method = 'put'
+        headers = self.get_headers()
+        dirname = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        dirname = f'VK{dirname}'
+        params = {"path": dirname}
+        response_type = 'json'
+        response = self._api_request(http_method, api_method, headers, params, response_type)
         timestamp = datetime.now().strftime('[%H:%M:%S %d-%m-%Y]:')
         if response.status_code == 201:
             with open('upload_log.txt', 'a', encoding='utf-8') as logfile:
